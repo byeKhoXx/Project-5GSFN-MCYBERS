@@ -1,0 +1,1 @@
+nc -l -p 1234 -s 10.0.5.4; sudo ip link set dev enp0s3 down
