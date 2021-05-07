@@ -50,9 +50,9 @@ $ sudo ryu-manager simple_monitor_13_telegraf.py ../ryu/ryu/app/rest_firewall.py
 ```sh
 Assuming you have the enviroment ready!
 
-Example: run
+Example: 
 > inlfux
-> show databases : to display the available local databases
+> show databases  #to display the available local databases
 > use <database name>
 > show measurements
 > select * from flows
