@@ -38,7 +38,6 @@ $ sudo dpkg -i grafana_7.4.3_amd64.deb
 $ rm grafana_7.4.3_amd64.deb
 $ sudo systemctl start grafana-server
 ```
-And then go to http://locahost:3000 with the credentials `admin:admin`
 
 ## Starting up
 ```sh
@@ -55,6 +54,7 @@ Steps:
 1. sudo systemctl restart telegraf
 2. sudo systemctl start influxdb
 3. sudosystemctl start grafana-server
+  1. And then go to http://locahost:3000 with the credentials `admin:admin`
 
 
 Example: 
