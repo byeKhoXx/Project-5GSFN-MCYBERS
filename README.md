@@ -67,5 +67,14 @@ Example:
 
 Example Delete table flows: 
 > delete from flows, ports     #it deletes the whole table. When generating new flows the table reappears!
+ 
+Setting up Datasource and Dashboards in Grafana:
+> Click the configuration icon on the left panel
+> Select Datasource
+> Add Datasource
+> Select InfluxDB
+> set the URL of the local influx running (http://localhost:8086)
+> *we can set multiple datasource and set only one as Default
+
 ```
 For more info of InfluxDB, Telegraf and Graphana, go to *Day 6 Lab*.
