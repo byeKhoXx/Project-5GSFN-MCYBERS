@@ -54,7 +54,8 @@ Steps:
 1. sudo systemctl restart telegraf
 2. sudo systemctl start influxdb
 3. sudosystemctl start grafana-server
-  1. And then go to http://locahost:3000 with the credentials `admin:admin`
+    3.1 And then go to http://locahost:3000 with the credentials `admin:admin`
+4. Generate traffic
 
 
 Example: 
