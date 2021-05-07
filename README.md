@@ -80,7 +80,7 @@ Setting up Datasource in Grafana:
 Setting up Dashboard in Grafana:
 > Click on the + and add a new panel
 > To make our lives easier - look at the picture below to visualize simple flows
-> ![image](https://user-images.githubusercontent.com/24268426/117440466-5d18d200-af34-11eb-8ef9-720fed731ed9.png)
+![Capture](https://user-images.githubusercontent.com/24268426/117440602-8df90700-af34-11eb-88c1-d64ade629b74.PNG)
 
 
 
