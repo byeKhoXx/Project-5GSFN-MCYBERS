@@ -49,6 +49,13 @@ $ sudo ryu-manager simple_monitor_13_telegraf.py ../ryu/ryu/app/rest_firewall.py
 ## Using Influx - Telegraf - Grafana
 ```sh
 Assuming you have the enviroment ready!
+Note: Tags can be change internally by modifying the python script
+
+Steps:
+1. sudo systemctl restart telegraf
+2. sudo systemctl start influxdb
+3. sudosystemctl start grafana-server
+
 
 Example: 
 > inlfux
