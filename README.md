@@ -46,4 +46,15 @@ $ sudo mn --custom Topology.py --topo mytopo --controller remote #Creates the ne
 $ sudo ryu-manager simple_monitor_13_telegraf.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
 ```
 
+## Using Influx - Telegraf - Grafana
+```sh
+Assuming you have the enviroment ready!
+
+Example: run
+> inlfux
+> show databases : to display the available local databases
+> use <database name>
+> show measurements
+> select * from flows
+```
 For more info of InfluxDB, Telegraf and Graphana, go to *Day 6 Lab*.
