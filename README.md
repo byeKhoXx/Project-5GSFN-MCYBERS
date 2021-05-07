@@ -78,7 +78,10 @@ Setting up Datasource in Grafana:
 > ***we can set multiple datasource and set only one as Default
 
 Setting up Dashboard in Grafana:
->
+> Click on the + and add a new panel
+> To make our lives easier - look at the picture below to visualize simple flows
+> ![image](https://user-images.githubusercontent.com/24268426/117440466-5d18d200-af34-11eb-8ef9-720fed731ed9.png)
+
 
 
 ```
