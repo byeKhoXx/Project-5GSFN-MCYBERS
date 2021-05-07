@@ -52,9 +52,12 @@ Assuming you have the enviroment ready!
 
 Example: 
 > inlfux
-> show databases  #to display the available local databases
+> show databases      #to display the available local databases
 > use <database name>
 > show measurements
 > select * from flows
+
+Example Delete table flows: 
+> delete from flows, ports     #it deletes the whole table. When generating new flows the table reappears!
 ```
 For more info of InfluxDB, Telegraf and Graphana, go to *Day 6 Lab*.
