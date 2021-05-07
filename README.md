@@ -80,9 +80,11 @@ Setting up Datasource in Grafana:
 Setting up Dashboard in Grafana:
 > Click on the + and add a new panel
 > To make our lives easier - look at the picture below to visualize simple flows
+```
 ![Capture](https://user-images.githubusercontent.com/24268426/117440602-8df90700-af34-11eb-88c1-d64ade629b74.PNG)
 
-
-
+```sh
+> by clicking on Query Inspector on the right we can see the raw request
 ```
+
 For more info of InfluxDB, Telegraf and Graphana, go to *Day 6 Lab*.
