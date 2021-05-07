@@ -87,6 +87,3 @@ Setting up Dashboard in Grafana:
 > by clicking on Query Inspector on the right we can see the raw request - in case we need to use the same command for CC
 ```
 ![image](https://user-images.githubusercontent.com/24268426/117441398-96057680-af35-11eb-9e13-b8fd94198aeb.png)
-
-
-For more info of InfluxDB, Telegraf and Graphana, go to *Day 6 Lab*.
