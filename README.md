@@ -65,7 +65,7 @@ Example:
 > show measurements
 > select * from flows
 
-Example Delete table flows: 
+Example Delete tables in Influx: 
 > delete from flows, ports     #it deletes the whole table. When generating new flows the table reappears!
  
 Setting up Datasource in Grafana:
