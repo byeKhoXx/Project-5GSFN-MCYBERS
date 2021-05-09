@@ -12,16 +12,25 @@ class MyTopo(Topo):
         dynDNS = self.addHost('dynDNS')
         cust = self.addHost('cust')
         control = self.addHost('control')
-        lan_sw = self.addSwitch('s1')
+        proxy = self.addHost('proxy')
+        cust_sw = self.addSwitch('s1')
         internet_sw = self.addSwitch('s2')
+        mitigation_sw = self.addSwitch('s3')
+        lan_sw = self.addSwitch('s4')
         # Add (bidirectional) links
-        self.addLink(internet_sw, lan_sw)
+        self.addLink(internet_sw, mitigation_sw)
+        self.addLink(internet_sw, cust_sw)
         self.addLink(internet_sw, c1)
         self.addLink(internet_sw, c2)
         self.addLink(internet_sw, c3)
-        self.addLink(lan_sw, dynDNS)
-        self.addLink(lan_sw, cust)
+        self.addLink(cust_sw, cust)
+        self.addLink(mitigation_sw, dynDNS)
+        self.addLink(mitigation_sw, proxy)
         self.addLink(lan_sw, control)
+        self.addLink(lan_sw, cust)
+        self.addLink(lan_sw, dynDNS)
+        self.addLink(lan_sw, proxy)
+        
 
 
 # Adding the 'topos' dict with a key/value pair to
