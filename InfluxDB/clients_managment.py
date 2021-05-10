@@ -63,6 +63,20 @@ def get_mean_for_last(client,time_slot,num_of_days = 10):
     result = packet_count_sum / len(packets)
     return result
 
+
+def get_last_two_minutes(client):
+    # TODO -> Return tupple of packets last two minutes 
+    # With packets like [timestamp, src_ip]
+    # return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] ]
+
+def get_number_15_minutes(client):
+    # TODO -> Return number (count()) of packets last 15 minutes 
+
+
+
+
+
+
 # Test code
 
 # Insert client

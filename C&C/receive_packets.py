@@ -21,16 +21,15 @@ print(f"The remote ip is {REMOTE_IP}")
 
 def dos_attack_handler(key):
     # TODO -> Afegir firewall rules
-    # TODO -> Call a dynDNS
 
 def ddos_attack_handler():
-    # TODO -> Call a dynDNS
-    # TODO -> Call a reverse proxy
+    # TODO -> Call a reverse proxy + dynDNS
     # TODO -> SW4 close default route
 
 # DoS detection
 def DoS():
-    packets = # TODO -> QUERY BD with tupple of packets last two minuts with packets like [timestamp, src_ip]
+    global client
+    packets = clients_managment.get_last_two_minutes(client)
 
     seconds = time.time()
     r = int((seconds / 60) % 2)
@@ -71,8 +70,8 @@ def DoS():
 # DDoS detection
 def DDoS():
     time_slot_calc = int((time.localtime().tm_hour * 60 + time.localtime().tm_min) / 15)  # Every 10 min
-    packets = # TODO -> DB query number of packets recived las 15min
     global client
+    packets = clients_managment.get_number_15_minutes(client)
     clients_managment.add_new_packet(client, date.today(), time_slot_calc, packets)
     mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
     if packets > mean10 * 2:
