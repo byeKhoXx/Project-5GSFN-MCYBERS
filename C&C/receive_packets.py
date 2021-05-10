@@ -20,10 +20,11 @@ print(f"The remote ip is {REMOTE_IP}")
 # TODO -> funcio detecti si acaba attack
 
 def dos_attack_handler(key):
-    # TODO -> Afegir firewall rules
+    # TODO -> Add firewall rules amb KEY IP
 
 def ddos_attack_handler():
-    # TODO -> Call a reverse proxy + dynDNS
+    # Dyn DNS: curl -u [NAME]:[PASS] http://[DYNDNS_IP]/?myip=[REVERSE_PROXY_IP]
+    # TODO -> Call a reverse proxy
     # TODO -> SW4 close default route
 
 # DoS detection
