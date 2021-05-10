@@ -17,6 +17,8 @@ print(f"The remote ip is {REMOTE_IP}")
 
 # cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 
+# DynDNS: https://github.com/arkanis/minidyndns
+
 # TODO -> funcio detecti si acaba attack
 
 def dos_attack_handler(key):
