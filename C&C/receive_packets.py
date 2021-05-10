@@ -1,6 +1,3 @@
-from response import dos_attack_handler, ddos_attack_handler
-from scapy.all import *
-from scapy.layers.http import HTTP, HTTPRequest, TCP_client
 from datetime import date
 import json
 import schedule
@@ -8,6 +5,7 @@ import threading
 import time
 import clients_managment
 import os
+import requests
 
 inp = input("Client:")
 
@@ -15,23 +13,46 @@ client = clients_managment.get_client_by_name(inp)
 REMOTE_IP = client.ip
 print(f"The remote ip is {REMOTE_IP}")
 
-# cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
+# Protection state
+DoSactive = False
+DDoSactive = False
 
+# cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 # DynDNS: https://github.com/arkanis/minidyndns
 
-# TODO -> funcio detecti si acaba attack
+# TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS
+def endDDoS():
+    # Change DynDNS record
+    r = requests.get('http://[DYNDNS_IP]/?myip=[WEBSERVER_IP]', auth=('[NAME]', '[PASS]'))
+
+# Every 10min we check if DoS is active
+def checkDoS():
+    global DoSactive
+    # If DoS is active we dissable the protection
+    if DoSactive == True:
+        DoSactive = False
+        # TODO -> Delete rules
 
 def dos_attack_handler(key):
-    # TODO -> Add firewall rules amb KEY IP
+    global DoSactive
+    # DoS protection active
+    DoSactive = True
+    # Add rule to block the IP
+    requests.post('http://localhost:8080/firewall/rules/[SwitchID]/[VLANID]', data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
 
 def ddos_attack_handler():
-    # Dyn DNS: curl -u [NAME]:[PASS] http://[DYNDNS_IP]/?myip=[REVERSE_PROXY_IP]
+    global DDoSactive
+    # DDoS protection active
+    DDoSactive = True
+    # Change DynDNS record
+    r = requests.get('http://[DYNDNS_IP]/?myip=[REVERSE_PROXY_IP]', auth=('[NAME]', '[PASS]'))
     # TODO -> Call a reverse proxy
-    # TODO -> SW4 close default route
+    requests.post('http://localhost:8080/firewall/rules/[SwitchID]/[VLANID]', data={'actions': 'DENY', 'priority': '2'})
 
 # DoS detection
 def DoS():
     global client
+    # Get the flows of last two minutes
     packets = clients_managment.get_last_two_minutes(client)
 
     seconds = time.time()
@@ -41,11 +62,13 @@ def DoS():
     d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
 
     for packk in packets:
-        # TODO -> IF pacck last minute :
+        # Count packets from last minute
+        # TODO -> IF pacck last minute:
             if (packk["ip_src"] in d1):
                 d1[packk["ip_src"]] = d1[packk["ip_src"]] + 1
             else:
                 d1[packk["ip_src"]] = 1
+        # Count packets from last two minutes
         if (packk["ip_src"] in d2):
             d2[packk["ip_src"]] = d1[packk["ip_src"]] + 1
         else:
@@ -72,10 +95,12 @@ def DoS():
 
 # DDoS detection
 def DDoS():
+    # Calculate the time slot
     time_slot_calc = int((time.localtime().tm_hour * 60 + time.localtime().tm_min) / 15)  # Every 10 min
     global client
+    # Get the last 15 min traffic
     packets = clients_managment.get_number_15_minutes(client)
-    clients_managment.add_new_packet(client, date.today(), time_slot_calc, packets)
+    # Get the mean
     mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
     if packets > mean10 * 2:
         # DDoS attack
@@ -84,7 +109,8 @@ def DDoS():
 
 
 def scheduler():  # Scheduler for tasks every X minutes
-    schedule.every().minute.do(Dos)  # Executing "clean_dic()" every minute
-    schedule.every(15).minutes.do(DDoS)  # Executing "add_to_ddbb()" eevry 15 minutes
+    schedule.every().minute.do(Dos)  # Executing "Dos()" every minute
+    schedule.every(10).minute.do(checkDoS)  # Executing "checkDoS()" every 10 minute
+    schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()
