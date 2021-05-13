@@ -5,6 +5,11 @@ from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER, DEAD_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.lib import hub
+from ryu.lib.packet import packet
+from ryu.lib.packet import ethernet
+from ryu.lib.packet import ipv4
+from ryu.lib.packet import icmp
+from ryu.lib import snortlib
 
 import socket
 import datetime
@@ -14,6 +19,7 @@ UDP_PORT = 8094
 
 
 class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
+    #_CONTEXTS = {'snortlib': snortlib.SnortLib}
 
     def __init__(self, *args, **kwargs):
         super(SimpleMonitor13, self).__init__(*args, **kwargs)
@@ -53,8 +59,9 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def _flow_stats_reply_handler(self, ev):
         FLOW_MSG = "flows,datapath=%x in-port=%x,eth-dst=\"%s\",out-port=%x,packets=%d,bytes=%d %d"
-        body = ev.msg.body
-        self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        body = ev.msg
+        self.logger.info("BODY -> ", body)
+        #self.logger.info('stats received: %016x', ev.msg.datapath.id)
 
         for stat in sorted([flow for flow in body if flow.priority == 1],
                            key=lambda flow: (flow.match['in_port'],
@@ -65,15 +72,16 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
                              stat.instructions[0].actions[0].port,
                              stat.packet_count, stat.byte_count,
                              timestamp)
-            self.logger.info(msg)
+            #self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
 
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
     def _port_stats_reply_handler(self, ev):
         PORT_MSG = "ports,datapath=%x,port=%x rx-pkts=%d,rx-bytes=%d,rx-error=%d,tx-pkts=%d,tx-bytes=%d,tx-error=%d %d"
-        body = ev.msg.body
-        self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        body = ev.msg
+        self.logger.info("BODY -> ", body)
+        #self.logger.info('stats received: %016x', ev.msg.datapath.id)
 
         for stat in sorted(body, key=attrgetter('port_no')):
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
@@ -81,6 +89,6 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
                              stat.rx_packets, stat.rx_bytes, stat.rx_errors,
                              stat.tx_packets, stat.tx_bytes, stat.tx_errors,
                              timestamp)
-            self.logger.info(msg)
+            #self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
