@@ -11,13 +11,14 @@ import requests
 inp = input("Client:")
 
 client = clients_managment.get_client_by_name(inp)
-# TODO -> Dades clients
-DYNDNS_Name = ''
-DYNDNS_Pass = ''
-DynDNS_IP = ''
-REVERSE_Proxy_IP = ''
-SwitchID = ''
-VlanID = ''
+
+# Client's data
+DYNDNS_Name = '' # Name from client in DynDNS
+DYNDNS_Pass = '' # Pass from client in DynDNS
+DynDNS_IP = '' # IP from the DynDNS
+REVERSE_Proxy_IP = '' # Reverse proxy IP
+SwitchID = '' # Switch ID of the customer
+VlanID = '' # VLAN ID
 
 # Protection state
 DoSactive = False
@@ -26,6 +27,12 @@ DDoSactive = False
 # cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 # DynDNS: https://github.com/arkanis/minidyndns
 
+def last_minute(packet):
+    # TODO -> Check if packet timestap is from last minute
+    now = time.time()
+    ptime = packet.timestamp
+
+
 # TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS
 def endDDoS():
     global DYNDNS_Name
@@ -33,7 +40,7 @@ def endDDoS():
     global DynDNS_IP
     global client
     # Change DynDNS record
-    r = requests.get('http://'+ DynDNS_IP + '/?myip='+client.ip, auth=(DYNDNS_Name, DYNDNS_Pass))
+    r = requests.get('http://'+ DynDNS_IP + '/?myip='+ client.ip, auth=(DYNDNS_Name, DYNDNS_Pass))
     print(r)
 
 # Every 10min we check if DoS is active
@@ -91,7 +98,8 @@ def DoS():
 
     for packk in packets:
         # Count packets from last minute
-        # TODO -> IF pacck last minute:
+        # Check if the packet is from last minute
+        if(last_minute(packk)):
             if (packk["ip_src"] in d1):
                 d1[packk["ip_src"]] = d1[packk["ip_src"]] + 1
             else:
@@ -137,7 +145,7 @@ def DDoS():
 
 
 def scheduler():  # Scheduler for tasks every X minutes
-    schedule.every().minute.do(Dos)  # Executing "Dos()" every minute
+    schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
     schedule.every(10).minute.do(checkDoS)  # Executing "checkDoS()" every 10 minute
     schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
