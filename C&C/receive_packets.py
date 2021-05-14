@@ -12,12 +12,12 @@ inp = input("Client:")
 
 client = clients_managment.get_client_by_name(inp)
 # TODO -> Dades clients
-DYNDNS_NAME = ''
-DYNDNS_PASS = ''
-DYNDNS_IP = ''
-REVERSE_PROXY_IP = ''
+DYNDNS_Name = ''
+DYNDNS_Pass = ''
+DynDNS_IP = ''
+REVERSE_Proxy_IP = ''
 SwitchID = ''
-VLANID = ''
+VlanID = ''
 
 # Protection state
 DoSactive = False
@@ -28,45 +28,54 @@ DDoSactive = False
 
 # TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS
 def endDDoS():
-    global DYNDNS_NAME
-    global DYNDNS_PASS
-    global DYNDNS_IP
+    global DYNDNS_Name
+    global DYNDNS_Pass
+    global DynDNS_IP
     global client
     # Change DynDNS record
-    r = requests.get('http://'+ DYNDNS_IP + '/?myip='+client.ip, auth=(DYNDNS_NAME, DYNDNS_PASS))
+    r = requests.get('http://'+ DynDNS_IP + '/?myip='+client.ip, auth=(DYNDNS_Name, DYNDNS_Pass))
+    print(r)
 
 # Every 10min we check if DoS is active
 def checkDoS():
     global DoSactive
+    global SwitchID
+    global VlanID
     # If DoS is active we dissable the protection
     if DoSactive == True:
         DoSactive = False
-        # TODO -> Delete rules
+        # Delete rules
+        r = requests.delete('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'rule_id': 'all'})
+        print(r)
+        
 
 def dos_attack_handler(key):
     global DoSactive
     global SwitchID
-    global VLANID
+    global VlanID
     # DoS protection active
     DoSactive = True
     # Add rule to block the IP
-    requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VLANID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
+    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
+    print(r)
 
 def ddos_attack_handler():
     global DDoSactive
-    global DYNDNS_NAME
-    global DYNDNS_PASS
-    global DYNDNS_IP
-    global REVERSE_PROXY_IP
+    global DYNDNS_Name
+    global DYNDNS_Pass
+    global DynDNS_IP
+    global REVERSE_Proxy_IP
     global SwitchID
-    global VLANID
+    global VlanID
     # DDoS protection active
     DDoSactive = True
     # Change DynDNS record
-    r = requests.get('http://'+ DYNDNS_IP + '/?myip='+REVERSE_PROXY_IP, auth=(DYNDNS_NAME, DYNDNS_PASS))
+    r = requests.get('http://'+ DynDNS_IP + '/?myip='+REVERSE_Proxy_IP, auth=(DYNDNS_Name, DYNDNS_Pass))
+    print(r)
     # TODO -> Call a reverse proxy
     # Firewall block trafic
-    requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VLANID, data={'actions': 'DENY', 'priority': '2'})
+    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'actions': 'DENY', 'priority': '2'})
+    print(r)
 
 # DoS detection
 def DoS():
