@@ -42,7 +42,7 @@ $ sudo systemctl start grafana-server
 ## Starting up
 ```sh
 $ sudo mn --custom Topology.py --topo mytopo --controller remote #Creates the network
-$ sudo ryu-manager simple_monitor_13_telegraf.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
+$ sudo ryu-manager simple_monitor_snort.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
 ```
 
 ## Using Influx - Telegraf - Grafana
