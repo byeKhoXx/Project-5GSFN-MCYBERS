@@ -7,11 +7,17 @@ import clients_managment
 import os
 import requests
 
+# Params of client
 inp = input("Client:")
 
 client = clients_managment.get_client_by_name(inp)
-REMOTE_IP = client.ip
-print(f"The remote ip is {REMOTE_IP}")
+# TODO -> Dades clients
+DYNDNS_NAME = ''
+DYNDNS_PASS = ''
+DYNDNS_IP = ''
+REVERSE_PROXY_IP = ''
+SwitchID = ''
+VLANID = ''
 
 # Protection state
 DoSactive = False
@@ -22,8 +28,12 @@ DDoSactive = False
 
 # TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS
 def endDDoS():
+    global DYNDNS_NAME
+    global DYNDNS_PASS
+    global DYNDNS_IP
+    global client
     # Change DynDNS record
-    r = requests.get('http://[DYNDNS_IP]/?myip=[WEBSERVER_IP]', auth=('[NAME]', '[PASS]'))
+    r = requests.get('http://'+ DYNDNS_IP + '/?myip='+client.ip, auth=(DYNDNS_NAME, DYNDNS_PASS))
 
 # Every 10min we check if DoS is active
 def checkDoS():
@@ -35,19 +45,28 @@ def checkDoS():
 
 def dos_attack_handler(key):
     global DoSactive
+    global SwitchID
+    global VLANID
     # DoS protection active
     DoSactive = True
     # Add rule to block the IP
-    requests.post('http://localhost:8080/firewall/rules/[SwitchID]/[VLANID]', data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
+    requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VLANID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
 
 def ddos_attack_handler():
     global DDoSactive
+    global DYNDNS_NAME
+    global DYNDNS_PASS
+    global DYNDNS_IP
+    global REVERSE_PROXY_IP
+    global SwitchID
+    global VLANID
     # DDoS protection active
     DDoSactive = True
     # Change DynDNS record
-    r = requests.get('http://[DYNDNS_IP]/?myip=[REVERSE_PROXY_IP]', auth=('[NAME]', '[PASS]'))
+    r = requests.get('http://'+ DYNDNS_IP + '/?myip='+REVERSE_PROXY_IP, auth=(DYNDNS_NAME, DYNDNS_PASS))
     # TODO -> Call a reverse proxy
-    requests.post('http://localhost:8080/firewall/rules/[SwitchID]/[VLANID]', data={'actions': 'DENY', 'priority': '2'})
+    # Firewall block trafic
+    requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VLANID, data={'actions': 'DENY', 'priority': '2'})
 
 # DoS detection
 def DoS():
