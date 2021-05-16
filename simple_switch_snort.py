@@ -118,13 +118,10 @@ class SimpleSwitchSnort(app_manager.RyuApp):
             UDP_IP = "127.0.0.1"
             UDP_PORT = 8094
             
-            IPS = "ips,src-ip=\"%s\", dst-ip=\"%s\", queries=%d, %d"
-            timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
-            msg = IPS % (src,dst, 1,timestamp)
-
-            MESSAGE = "test_measurement1,port=%d tx=%d,rx=%d %d"
-            msg = MESSAGE % (2, 11, 11, timestamp)
-            self.logger.info(msg)
+            IPS = "ips,pkts=%d s_ip=\"%s\",d_ip=\"%s\" %d"
+            timestamp = int(datetime.datetime.now().timestamp() * 1000000000) #nanoseconds since 1st Jan 1970
+            msg = IPS % (1, src, dst, timestamp)
+            print(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
         
