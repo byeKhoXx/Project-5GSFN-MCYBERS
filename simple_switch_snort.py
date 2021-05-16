@@ -121,7 +121,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
             IPS = "ips,pkts=%d s_ip=\"%s\",d_ip=\"%s\" %d"
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000) #nanoseconds since 1st Jan 1970
             msg = IPS % (1, src, dst, timestamp)
-            print(msg)
+            self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
         
