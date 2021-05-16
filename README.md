@@ -39,6 +39,14 @@ $ rm grafana_7.4.3_amd64.deb
 $ sudo systemctl start grafana-server
 ```
 
+### Client webserver
+First of all you'll need docker installed. It can be easily done by using their conveninence script available at their webpage. Then, inside the client-webserver folder run:
+
+```sh
+sudo docker build -t client-webserver .
+sudo docker run -dit -p 8080:80 client-webserver
+```
+
 ## Starting up
 ```sh
 $ sudo mn --custom Topology.py --topo mytopo --controller remote #Creates the network
