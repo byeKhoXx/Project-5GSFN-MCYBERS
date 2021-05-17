@@ -67,6 +67,11 @@ def get_mean_for_last(client,time_slot,num_of_days = 10):
     return result
 
 
+def influxDB():
+	clientInflux = InfluxDBClient(host='localhost', port=8086)
+	clientInflux.switch_database('RYU')
+
+
 def get_last_two_minutes(client):
     """" Return tupple of packets last two minutes 
          With packets like [timestamp, src_ip]
@@ -96,9 +101,6 @@ def get_number_15_minutes(client):
         count = j['count_s_ip']
     return count
 	
-def influxDB():
-	clientInflux = InfluxDBClient(host='localhost', port=8086)
-	clientInflux.switch_database('RYU')
 
 
 
