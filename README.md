@@ -71,6 +71,7 @@ Example:
 > show databases      #to display the available local databases
 > use <database name>
 > show measurements
+> SHOW FIELD KEYS ON RYU
 > select * from flows
 
 Example Delete tables in Influx: 
