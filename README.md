@@ -50,7 +50,7 @@ sudo docker run -dit -p 8080:80 client-webserver
 ## Starting up
 ```sh
 $ sudo mn --custom Topology.py --topo mytopo --controller remote #Creates the network
-$ sudo ryu-manager simple_monitor_snort.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
+$ sudo ryu-manager simple_switch_snort.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
 ```
 
 ## Using Influx - Telegraf - Grafana
