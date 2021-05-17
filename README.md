@@ -49,8 +49,9 @@ sudo docker run -dit -p 8080:80 client-webserver
 
 ## Starting up
 ```sh
-$ sudo mn --custom Topology.py --topo mytopo --controller remote #Creates the network
+$ sudo mn --custom Topology.py --topo mytopo --switch ovsk --controller remote #Creates the network
 $ sudo ryu-manager simple_switch_snort.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
+$ ./init_fw.sh #Initialize the Firewall to let the traffic go through the switches. Add execution permission to the script if it is necessary.
 ```
 
 ## Using Influx - Telegraf - Grafana
