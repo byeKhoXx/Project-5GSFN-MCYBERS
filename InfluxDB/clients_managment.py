@@ -7,8 +7,7 @@ from db_model.db_connection import db_connection
 from db_model.client import Client
 from db_model.packet import Packet
 from influxdb import InfluxDBClient
-clientInflux = InfluxDBClient(host='localhost', port=8086)
-clientInflux.switch_database('RYU')
+
 
 
 def add_new_client(name, ip):
@@ -72,7 +71,7 @@ def get_last_two_minutes(client):
     """" Return tupple of packets last two minutes 
          With packets like [timestamp, src_ip]
          return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """"
-    
+    influxDB()
     ip = " '"+client.ip+"' "
     last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"s_ip\" =  "+ip+"")
     tupletsArray = []
@@ -88,7 +87,7 @@ def get_last_two_minutes(client):
 
 def get_number_15_minutes(client):
     """"Return number (count()) of packets last 15 minutes """"
-    
+    influxDB()
     ip = " '"+client.ip+"' "
     last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     count = -1
@@ -97,7 +96,9 @@ def get_number_15_minutes(client):
         count = j['count_s_ip']
     return count
 	
-
+def influxDB():
+	clientInflux = InfluxDBClient(host='localhost', port=8086)
+	clientInflux.switch_database('RYU')
 
 
 
