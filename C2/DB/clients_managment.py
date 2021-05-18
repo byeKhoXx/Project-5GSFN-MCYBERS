@@ -3,9 +3,9 @@ Simple database connector
 """
 
 from datetime import date,timedelta
-from db_model.db_connection import db_connection
-from db_model.client import Client
-from db_model.packet import Packet
+from DB.db_model.db_connection import db_connection
+from DB.db_model.client import Client
+from DB.db_model.packet import Packet
 from influxdb import InfluxDBClient
 
 
@@ -66,33 +66,32 @@ def get_mean_for_last(client,time_slot,num_of_days = 10):
     result = packet_count_sum / len(packets)
     return result
 
-
-def influxDB():
-	clientInflux = InfluxDBClient(host='localhost', port=8086)
-	clientInflux.switch_database('RYU')
+class Tuples:
+    def __init__(self, time, ip_src):
+        self.time = time
+        self.ip_src = ip_src
 
 
 def get_last_two_minutes(client):
-    """" Return tupple of packets last two minutes 
+    """ Return tupple of packets last two minutes 
          With packets like [timestamp, src_ip]
-         return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """"
-    influxDB()
+         return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """
+    clientInflux = InfluxDBClient(host='localhost', port=8086)
+    clientInflux.switch_database('RYU')
     ip = " '"+client.ip+"' "
     last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"s_ip\" =  "+ip+"")
     tupletsArray = []
     for i in last2.get_points(measurement='ips'):
-        tuples = ( i['time'],i['s_ip'])
         #print(tuples)
-        tupletsArray.append(tuples)
+        tupletsArray.append( Tuples(i['time'], i['s_ip']) )
     return tupletsArray
-		
-		
-		
+			
 		
 
 def get_number_15_minutes(client):
-    """"Return number (count()) of packets last 15 minutes """"
-    influxDB()
+    """ Return number (count()) of packets last 15 minutes """
+    clientInflux = InfluxDBClient(host='localhost', port=8086)
+    clientInflux.switch_database('RYU')
     ip = " '"+client.ip+"' "
     last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     count = -1

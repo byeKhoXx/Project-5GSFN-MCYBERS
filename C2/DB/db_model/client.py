@@ -24,8 +24,7 @@ class Client:
     @staticmethod
     def get_client_by_name(name, db):
         cursor = db.get_cursor()
-        cursor.execute(
-            "SELECT * FROM Clients WHERE name=:name", {'name': name})
+        cursor.execute("SELECT * FROM Clients WHERE name=:name", {'name': name})
         query_result = cursor.fetchall()
         clients = Client.convert_list(query_result)
         result = clients[0] if clients else None

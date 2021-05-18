@@ -3,7 +3,8 @@ import json
 import schedule
 import threading
 import time
-import clients_managment
+import sys
+from DB import clients_managment
 import os
 import requests
 
@@ -11,6 +12,11 @@ import requests
 inp = input("Client:")
 
 client = clients_managment.get_client_by_name(inp)
+
+while client is None:
+    print("This client doesn't exist")
+    inp = input("Client:")
+    client = clients_managment.get_client_by_name(inp)
 
 # Client's data
 DYNDNS_Name = '' # Name from client in DynDNS
@@ -23,6 +29,23 @@ VlanID = '' # VLAN ID
 # Protection state
 DoSactive = False
 DDoSactive = False
+
+'''
+INIT TEST ZONE
+'''
+
+packets = clients_managment.get_number_15_minutes(client)
+print(packets)
+
+#mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
+#print(mean10)
+
+packets1 = clients_managment.get_last_two_minutes(client)
+print(packets1)
+
+'''
+END TEST ZONE
+'''
 
 # cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 # DynDNS: https://github.com/arkanis/minidyndns
@@ -57,6 +80,8 @@ def checkDoS():
         
 
 def dos_attack_handler(key):
+    print("DoS handler")
+
     global DoSactive
     global SwitchID
     global VlanID
@@ -67,6 +92,8 @@ def dos_attack_handler(key):
     print(r)
 
 def ddos_attack_handler():
+    print("DDoS handler")
+
     global DDoSactive
     global DYNDNS_Name
     global DYNDNS_Pass
@@ -86,6 +113,7 @@ def ddos_attack_handler():
 
 # DoS detection
 def DoS():
+    print("Checking for DoS")
     global client
     # Get the flows of last two minutes
     packets = clients_managment.get_last_two_minutes(client)
@@ -97,9 +125,9 @@ def DoS():
     d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
 
     for packk in packets:
-        # Count packets from last minute
         # Check if the packet is from last minute
         if(last_minute(packk)):
+            # Count packets from last minute
             if (packk["ip_src"] in d1):
                 d1[packk["ip_src"]] = d1[packk["ip_src"]] + 1
             else:
@@ -131,6 +159,7 @@ def DoS():
 
 # DDoS detection
 def DDoS():
+    print("Checking for DDoS")
     # Calculate the time slot
     time_slot_calc = int((time.localtime().tm_hour * 60 + time.localtime().tm_min) / 15)  # Every 10 min
     global client
@@ -146,7 +175,12 @@ def DDoS():
 
 def scheduler():  # Scheduler for tasks every X minutes
     schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
-    schedule.every(10).minute.do(checkDoS)  # Executing "checkDoS()" every 10 minute
+    schedule.every(10).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
     schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()
+
+
+t = threading.Thread(target=scheduler)  # Threading the scheduler
+# t.daemon = True  # set thread to daemon ('ALGO' won't be printed in this case)
+t.start()
