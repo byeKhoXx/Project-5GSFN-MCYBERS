@@ -41,9 +41,7 @@ print(packets)
 #print(mean10)
 
 packets1 = clients_managment.get_last_two_minutes(client)
-#print(packets1)
 
-d1 = dict()  # Packets from last minute [ip_src, number of packets]
 d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
 
 for packk in packets1:
@@ -65,7 +63,7 @@ END TEST ZONE
 # DynDNS: https://github.com/arkanis/minidyndns
 
 def last_minute(packet):
-    # TODO -> Check if packet timestap is from last minute
+    # TODO -> Check if packet timestap is from last minute # FORMAT 2021-05-23T18:29:30.783788032Z
     now = time.time()
     ptime = packet.time
 
@@ -84,12 +82,11 @@ def endDDoS():
 def checkDoS():
     global DoSactive
     global SwitchID
-    global VlanID
     # If DoS is active we dissable the protection
     if DoSactive == True:
         DoSactive = False
         # Delete rules
-        r = requests.delete('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'rule_id': 'all'})
+        r = requests.delete('http://localhost:8080/firewall/rules/' + SwitchID, data={'rule_id': 'all'})
         print(r)
         
 
@@ -98,11 +95,10 @@ def dos_attack_handler(key):
 
     global DoSactive
     global SwitchID
-    global VlanID
     # DoS protection active
     DoSactive = True
     # Add rule to block the IP
-    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
+    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
     print(r)
 
 def ddos_attack_handler():
@@ -114,7 +110,6 @@ def ddos_attack_handler():
     global DynDNS_IP
     global REVERSE_Proxy_IP
     global SwitchID
-    global VlanID
     # DDoS protection active
     DDoSactive = True
     # Change DynDNS record
@@ -122,7 +117,7 @@ def ddos_attack_handler():
     print(r)
     # TODO -> Call a reverse proxy
     # Firewall block trafic
-    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID + '/' + VlanID, data={'actions': 'DENY', 'priority': '2'})
+    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
     print(r)
 
 # DoS detection
@@ -142,15 +137,15 @@ def DoS():
         # Check if the packet is from last minute
         if(last_minute(packk)):
             # Count packets from last minute
-            if (packk["ip_src"] in d1):
-                d1[packk["ip_src"]] = d1[packk["ip_src"]] + 1
+            if (packk.ip_src in d1):
+                d1[packk.ip_src] = d1[packk.ip_src] + 1
             else:
-                d1[packk["ip_src"]] = 1
+                d1[packk.ip_src] = 1
         # Count packets from last two minutes
-        if (packk["ip_src"] in d2):
-            d2[packk["ip_src"]] = d1[packk["ip_src"]] + 1
+        if (packk.ip_src in d2):
+            d2[packk.ip_src] = d2[packk.ip_src] + 1
         else:
-            d2[packk["ip_src"]] = 1
+            d2[packk.ip_src] = 1
 
 
     # Check last minute
