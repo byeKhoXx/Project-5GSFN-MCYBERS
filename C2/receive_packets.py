@@ -23,8 +23,8 @@ DYNDNS_Name = '' # Name from client in DynDNS
 DYNDNS_Pass = '' # Pass from client in DynDNS
 DynDNS_IP = '' # IP from the DynDNS
 REVERSE_Proxy_IP = '' # Reverse proxy IP
-SwitchID = '' # Switch ID of the customer
-VlanID = '' # VLAN ID
+SwitchID = '0000000000000002' # Switch ID of the customer
+
 
 # Protection state
 DoSactive = False
@@ -41,7 +41,21 @@ print(packets)
 #print(mean10)
 
 packets1 = clients_managment.get_last_two_minutes(client)
-print(packets1)
+#print(packets1)
+
+d1 = dict()  # Packets from last minute [ip_src, number of packets]
+d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
+
+for packk in packets1:
+    print(packk.time) #2021-05-23T18:29:30.783788032Z
+    if (packk.ip_src in d2):
+        d2[packk.ip_src] = d2[packk.ip_src] + 1
+    else:
+        d2[packk.ip_src] = 1
+
+# Check last two minutes
+for key in d2:
+    print("D2-> " + str(d2[key]))
 
 '''
 END TEST ZONE
@@ -53,7 +67,7 @@ END TEST ZONE
 def last_minute(packet):
     # TODO -> Check if packet timestap is from last minute
     now = time.time()
-    ptime = packet.timestamp
+    ptime = packet.time
 
 
 # TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS

@@ -77,7 +77,7 @@ def get_last_two_minutes(client):
          With packets like [timestamp, src_ip]
          return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """
     clientInflux = InfluxDBClient(host='localhost', port=8086)
-    clientInflux.switch_database('RYU')
+    clientInflux.switch_database('Test')
     ip = " '"+client.ip+"' "
     last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"s_ip\" =  "+ip+"")
     tupletsArray = []
@@ -91,7 +91,7 @@ def get_last_two_minutes(client):
 def get_number_15_minutes(client):
     """ Return number (count()) of packets last 15 minutes """
     clientInflux = InfluxDBClient(host='localhost', port=8086)
-    clientInflux.switch_database('RYU')
+    clientInflux.switch_database('Test')
     ip = " '"+client.ip+"' "
     last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     count = -1
