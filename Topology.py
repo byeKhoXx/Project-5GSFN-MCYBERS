@@ -1,14 +1,8 @@
 from mininet.net import Mininet
-
 from mininet.node import Controller, RemoteController, OVSKernelSwitch, UserSwitch
-
 from mininet.cli import CLI
-
 from mininet.log import setLogLevel
-
-from mininet.link import Link, TCLink
-
-
+from mininet.link import Link, TCLink, Intf
 from mininet.topo import Topo
 
 
@@ -126,10 +120,15 @@ class MyTopo(Topo):
         # *** Customer Webserver *** NOT WORKING AUTOMATICALLY
         cust.cmd("python -m http.server --directory customer_webserver/ 80")
 
-        
-        
-        
+        # *** Command and Controll *** 
+	s4 = net.addSwitch('s4')
+	net.addLink(s3, control)
+	s4_node = mn.getNodeByName("s4")
+    	Intf("lo", node=s4_node)
+    	
+    	CLI(mn)
 
+        
 
 # Adding the 'topos' dict with a key/value pair to
 # generate our newly defined topology enables one
