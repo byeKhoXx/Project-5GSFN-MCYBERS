@@ -2,10 +2,10 @@
 SERIAL: 2015110234
 acme:
   pass: acme
-  A: 10.0.2.6
+  A: 10.0.2.2
 dns:
   pass: dns
-  A: 10.0.2.15
+  A: 10.0.3.2
 proxy:
   pass: proxy
-  A: 10.0.2.6
+  A: 10.0.3.2

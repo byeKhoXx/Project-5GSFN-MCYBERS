@@ -40,12 +40,33 @@ $ sudo systemctl start grafana-server
 ```
 
 ### Client webserver
-First of all you'll need docker installed. It can be easily done by using their conveninence script available at their webpage. Then, inside the client-webserver folder run:
+First of all you'll need python http server. 
+```sh
+$ pip3 install socketserver
+```
+
+*** IF NOT WORKING AUTOMATICALLY ***
+If the webserver does not work automatically, run in the `cust` terminal teh following command:
 
 ```sh
-sudo docker build -t client-webserver .
-sudo docker run -dit -p 8080:80 client-webserver
+$ python -m http.server --directory customer_webserver/ 80
 ```
+
+### DynDNS
+First of all you'll need ruby. 
+```sh
+$ sudo apt install ruby
+```
+
+*** IF NOT WORKING AUTOMATICALLY ***
+If the dns does not work automatically, run in the `dynDNS` terminal teh following command:
+
+```sh
+$ cd dns && ruby dns.rb
+```
+
+
+
 
 ## Starting up
 ```sh
@@ -55,7 +76,7 @@ $ ./init_fw.sh #Initialize the Firewall to let the traffic go through the switch
 ```
 
 ## Using Influx - Telegraf - Grafana
-```sh
+
 Assuming you have the enviroment ready!
 Note: Tags can be change internally by modifying the python script
 
@@ -68,17 +89,21 @@ Steps:
 
 
 Example: 
+```sh
 > inlfux
 > show databases      #to display the available local databases
 > use <database name>
 > show measurements
 > SHOW FIELD KEYS ON RYU
 > select * from flows
-
+```
 Example Delete tables in Influx: 
+```sh
 > delete from flows, ports     #it deletes the whole table. When generating new flows the table reappears!
+```
  
 Setting up Datasource in Grafana:
+```sh
 > Click the configuration icon on the left panel
 > Select Datasource
 > Add Datasource
@@ -86,15 +111,18 @@ Setting up Datasource in Grafana:
 > set the URL of the local influx running (http://localhost:8086)
 > set the name of the DB (eg. RYU)
 > ***we can set multiple datasource and set only one as Default
+```
 
 Setting up Dashboard in Grafana:
+
 > Click on the + and add a new panel
 > To make our lives easier - look at the picture below to visualize simple flows
-```
+
+
 ![Capture](https://user-images.githubusercontent.com/24268426/117440602-8df90700-af34-11eb-88c1-d64ade629b74.PNG)
 
-```sh
+
 > by clicking on Query Inspector on the right we can see the raw request - in case we need to use the same command for CC
 > ![image](https://user-images.githubusercontent.com/24268426/117441398-96057680-af35-11eb-9e13-b8fd94198aeb.png)
-```
+
 

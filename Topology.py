@@ -59,7 +59,7 @@ class MyTopo(Topo):
         s2.start( [c0] )
         s3.start( [c0] )
 
-        
+        # Router 1 config
         r1.cmd("ifconfig r1-eth0 0")
         r1.cmd("ifconfig r1-eth0 hw ether 00:00:00:00:20:01")
         r1.cmd("ip addr add 10.0.1.1/24 brd + dev r1-eth0")
@@ -71,6 +71,7 @@ class MyTopo(Topo):
         r1.cmd("ip addr add 10.0.3.1/24 brd + dev r1-eth2")
         r1.cmd("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
+	# Router 2 config
         r2.cmd("ifconfig r2-eth0 0")
         r2.cmd("ifconfig r2-eth0 hw ether 00:00:00:00:30:01")
         r2.cmd("ip addr add 10.0.3.2/24 brd + dev r2-eth0")
@@ -79,6 +80,7 @@ class MyTopo(Topo):
         r2.cmd("ip addr add 192.168.1.1/24 brd + dev r2-eth1")
         r2.cmd("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
+	# Static routes
         r1.cmd("ip route add default via 10.0.3.2")
         r2.cmd("ip route add default via 10.0.3.1")
         c1.cmd("ip route add default via 10.0.1.1")
@@ -88,8 +90,41 @@ class MyTopo(Topo):
         dynDNS.cmd("ip route add default via 192.168.1.1")
         proxy.cmd("ip route add default via 192.168.1.1")
         control.cmd("ip route add default via 192.168.1.1")
+        
 
+	# *** Router 2 NAT ***
+	# - Proxy configuration
+	r2.cmd("iptables -t nat -A PREROUTING -p tcp -d 10.0.3.2 --dport 80 -i r2-eth0 -j DNAT --to-destination 192.168.1.2")
+	r2.cmd("iptables -t nat -A POSTROUTING -p tcp -s 192.168.1.2 -i r2-eth1 -j SNAT --to 10.0.3.2")
+	
+	# - DNS configuration
+	# -- HTTP Service
+	r2.cmd("iptables -t nat -A PREROUTING -p tcp -d 10.0.3.2 --dport 8000 -i r2-eth0 -j DNAT --to-destination 192.168.1.3")
+	r2.cmd("iptables -t nat -A POSTROUTING -p tcp -s 192.168.1.3 -i r2-eth1 -j SNAT --to 10.0.3.2")
+	
+	# -- DNS Service
+	r2.cmd("iptables -t nat -A PREROUTING -p udp -d 10.0.3.2 --dport 53 -i r2-eth0 -j DNAT --to-destination 192.168.1.3")
+	r2.cmd("iptables -t nat -A POSTROUTING -p udp -s 192.168.1.3 -i r2-eth1 -j SNAT --to 10.0.3.2")
+	
+	# *** DNS configuration *** NOT WORKING AUTOMATICALLY
+	# - Start DNS
+	dynDNS.cmd("cd dns && ruby dns.rb &")
+	
+	# - Change default DNS
+	r1.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        r2.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        c1.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        c2.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        c3.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        cust.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        dynDNS.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        proxy.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+        control.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')
+	
         CLI( net )
+        
+        # *** Customer Webserver *** NOT WORKING AUTOMATICALLY
+        cust.cmd("python -m http.server --directory customer_webserver/ 80")
 
         
         
