@@ -84,8 +84,6 @@ class MyTopo(Topo):
         dynDNS.cmd("ip route add default via 192.168.1.1")
         proxy.cmd("ip route add default via 192.168.1.1")
         control.cmd("ip route add default via 192.168.1.1")
-        # Influx deamon start
-        control.cmd("influxd &")
 
         # *** Router 2 NAT ***
         # - Proxy configuration

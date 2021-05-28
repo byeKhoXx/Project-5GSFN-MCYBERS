@@ -4,47 +4,52 @@ import schedule
 import threading
 import time
 import sys
-from DB import clients_managment
 import os
 import requests
 
-# Params of client
-inp = input("Client:")
-
-client = clients_managment.get_client_by_name(inp)
-
-while client is None:
-    print("This client doesn't exist")
-    inp = input("Client:")
-    client = clients_managment.get_client_by_name(inp)
 
 # Client's data
-DYNDNS_Name = '' # Name from client in DynDNS
-DYNDNS_Pass = '' # Pass from client in DynDNS
-DynDNS_IP = '' # IP from the DynDNS
+DYNDNS_Name = 'acme' # Name from client in DynDNS
+DYNDNS_Pass = 'acme' # Pass from client in DynDNS
+DynDNS_IP = '10.0.3.2:8000' # IP from the DynDNS
 REVERSE_Proxy_IP = '' # Reverse proxy IP
 SwitchID = '0000000000000002' # Switch ID of the customer
-
+client = "10.0.2.2"
 
 # Protection state
 DoSactive = False
 DDoSactive = False
 
+class Tuples:
+    def __init__(self, time, ip_src):
+        self.time = time
+        self.ip_src = ip_src
+    
+    def to_json(self):
+    	return {"time": self.time, "ip_src": self.ip_src}
+    	
+
+def get_data():
+    with open("data.json", "r") as fp:
+        data = json.load(fp)
+        fp.close()
+    return [Tuples(elem['time'], elem['ip_src']) for elem in data["2"]], data["15"], data['mean']
+
 '''
 INIT TEST ZONE
 '''
 
-packets = clients_managment.get_number_15_minutes(client)
-print(packets)
+
+packets2, packets15, mean = get_data()
+print(packets2, packets15, mean)
 
 #mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
 #print(mean10)
 
-packets1 = clients_managment.get_last_two_minutes(client)
 
 d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
 
-for packk in packets1:
+for packk in packets2:
     print(packk.time) #2021-05-23T18:29:30.783788032Z
     if (packk.ip_src in d2):
         d2[packk.ip_src] = d2[packk.ip_src] + 1
@@ -58,6 +63,9 @@ for key in d2:
 '''
 END TEST ZONE
 '''
+
+
+
 
 # cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 # DynDNS: https://github.com/arkanis/minidyndns
@@ -125,7 +133,7 @@ def DoS():
     print("Checking for DoS")
     global client
     # Get the flows of last two minutes
-    packets = clients_managment.get_last_two_minutes(client)
+    packets, _, _ = get_data()
 
     seconds = time.time()
     r = int((seconds / 60) % 2)
@@ -170,12 +178,11 @@ def DoS():
 def DDoS():
     print("Checking for DDoS")
     # Calculate the time slot
-    time_slot_calc = int((time.localtime().tm_hour * 60 + time.localtime().tm_min) / 15)  # Every 10 min
     global client
     # Get the last 15 min traffic
-    packets = clients_managment.get_number_15_minutes(client)
+    _, packets, _ = get_data()
     # Get the mean
-    mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
+    _, _, mean10 = get_data()   
     if packets > mean10 * 2:
         # DDoS attack
         print("NEW ATTACK: DDoS")
@@ -188,6 +195,8 @@ def scheduler():  # Scheduler for tasks every X minutes
     schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()
+
+
 
 
 t = threading.Thread(target=scheduler)  # Threading the scheduler

@@ -3,11 +3,12 @@ Simple database connector
 """
 
 from datetime import date,timedelta
-from DB.db_model.db_connection import db_connection
-from DB.db_model.client import Client
-from DB.db_model.packet import Packet
+from .db_model.db_connection import db_connection
+from .db_model.client import Client
+from .db_model.packet import Packet
 from influxdb import InfluxDBClient
-
+import os
+from time import sleep
 
 
 def add_new_client(name, ip):
@@ -70,34 +71,43 @@ class Tuples:
     def __init__(self, time, ip_src):
         self.time = time
         self.ip_src = ip_src
+    
+    def to_json(self):
+    	return {"time": self.time, "ip_src": self.ip_src}
 
 
 def get_last_two_minutes(client):
     """ Return tupple of packets last two minutes 
          With packets like [timestamp, src_ip]
          return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """
+    os.system("influxd >/dev/null 2>&1 &") 
+    sleep(1)
     clientInflux = InfluxDBClient(host='localhost', port=8086)
-    clientInflux.switch_database('Test')
+    clientInflux.switch_database('Project')
     ip = " '"+client.ip+"' "
     last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"s_ip\" =  "+ip+"")
     tupletsArray = []
     for i in last2.get_points(measurement='ips'):
         #print(tuples)
         tupletsArray.append( Tuples(i['time'], i['s_ip']) )
+    os.system("killall influxd >/dev/null 2>&1 &")
     return tupletsArray
 			
 		
 
 def get_number_15_minutes(client):
     """ Return number (count()) of packets last 15 minutes """
+    os.system("influxd >/dev/null 2>&1 &") 
+    sleep(1)
     clientInflux = InfluxDBClient(host='localhost', port=8086)
-    clientInflux.switch_database('Test')
+    clientInflux.switch_database('Project')
     ip = " '"+client.ip+"' "
     last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     count = -1
     for j in last15.get_points(measurement='ips'):
         #print(j['count_s_ip'])
         count = j['count_s_ip']
+    os.system("killall influxd >/dev/null 2>&1 &")
     return count
 	
 
