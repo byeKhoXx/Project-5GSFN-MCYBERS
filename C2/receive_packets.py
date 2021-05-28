@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import json
 import schedule
 import threading
@@ -8,13 +8,15 @@ import os
 import requests
 
 
+
 # Client's data
 DYNDNS_Name = 'acme' # Name from client in DynDNS
 DYNDNS_Pass = 'acme' # Pass from client in DynDNS
 DynDNS_IP = '10.0.3.2:8000' # IP from the DynDNS
-REVERSE_Proxy_IP = '' # Reverse proxy IP
 SwitchID = '0000000000000002' # Switch ID of the customer
 client = "10.0.2.2"
+REVERSE_Proxy_IP = "10.0.3.2"
+
 
 # Protection state
 DoSactive = False
@@ -38,14 +40,9 @@ def get_data():
 '''
 INIT TEST ZONE
 '''
-
-
+'''
 packets2, packets15, mean = get_data()
 print(packets2, packets15, mean)
-
-#mean10 = clients_managment.get_mean_for_last(client, time_slot_calc)
-#print(mean10)
-
 
 d2 = dict()  # Packets from last two minutes  [ip_src, number of packets]
 
@@ -59,32 +56,34 @@ for packk in packets2:
 # Check last two minutes
 for key in d2:
     print("D2-> " + str(d2[key]))
-
+'''
 '''
 END TEST ZONE
 '''
-
-
 
 
 # cron ->sched.scheduler  https://docs.python.org/3/library/sched.html
 # DynDNS: https://github.com/arkanis/minidyndns
 
 def last_minute(packet):
-    # TODO -> Check if packet timestap is from last minute # FORMAT 2021-05-23T18:29:30.783788032Z
+    # TODO -> Check if works # FORMAT 2021-05-23T18:29:30.783788032Z
+    ptime = datetime.strptime(packet.time, '%A, %B %d, %Y')
     now = time.time()
     ptime = packet.time
+    if(ptime.min > (now - 1)): return True
+    else: return False
 
-
-# TODO ->crida que ha de fer el Reverseproxy quan no hi hagi sintomes de DDoS
 def endDDoS():
     global DYNDNS_Name
     global DYNDNS_Pass
     global DynDNS_IP
+    global DDoSactive
     global client
     # Change DynDNS record
-    r = requests.get('http://'+ DynDNS_IP + '/?myip='+ client.ip, auth=(DYNDNS_Name, DYNDNS_Pass))
-    print(r)
+    if DDoSactive == True:
+        DDoSactive = False
+        r = requests.get('http://'+ DynDNS_IP + '/?myip='+ client, auth=(DYNDNS_Name, DYNDNS_Pass))
+        print(r)
 
 # Every 10min we check if DoS is active
 def checkDoS():
@@ -109,9 +108,9 @@ def dos_attack_handler(key):
     r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
     print(r)
 
+
 def ddos_attack_handler():
     print("DDoS handler")
-
     global DDoSactive
     global DYNDNS_Name
     global DYNDNS_Pass
@@ -123,15 +122,14 @@ def ddos_attack_handler():
     # Change DynDNS record
     r = requests.get('http://'+ DynDNS_IP + '/?myip='+REVERSE_Proxy_IP, auth=(DYNDNS_Name, DYNDNS_Pass))
     print(r)
-    # TODO -> Call a reverse proxy
     # Firewall block trafic
     r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
     print(r)
 
+
 # DoS detection
 def DoS():
     print("Checking for DoS")
-    global client
     # Get the flows of last two minutes
     packets, _, _ = get_data()
 
@@ -178,7 +176,6 @@ def DoS():
 def DDoS():
     print("Checking for DDoS")
     # Calculate the time slot
-    global client
     # Get the last 15 min traffic
     _, packets, _ = get_data()
     # Get the mean
@@ -191,6 +188,7 @@ def DDoS():
 
 def scheduler():  # Scheduler for tasks every X minutes
     schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
+    schedule.every(5).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
     schedule.every(10).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
     schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
