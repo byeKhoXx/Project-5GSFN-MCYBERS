@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import json
 import schedule
 import threading
@@ -66,11 +66,11 @@ END TEST ZONE
 # DynDNS: https://github.com/arkanis/minidyndns
 
 def last_minute(packet):
-    # TODO -> Check if works # FORMAT 2021-05-23T18:29:30.783788032Z
-    ptime = datetime.strptime(packet.time, '%A, %B %d, %Y')
-    now = time.time()
-    ptime = packet.time
-    if(ptime.min > (now - 1)): return True
+    # FORMAT 2021-05-23T18:29:30.783788032Z
+    string = packet.time
+    ptime = datetime.strptime(string[0:19], "%Y-%m-%dT%H:%M:%S")
+    now = datetime.now()
+    if(ptime > (now - timedelta(0,60))): return True
     else: return False
 
 def endDDoS():
