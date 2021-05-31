@@ -9,6 +9,7 @@ from .db_model.packet import Packet
 from influxdb import InfluxDBClient
 import os
 from time import sleep
+import socket
 
 
 def add_new_client(name, ip):
@@ -91,6 +92,17 @@ def get_last_two_minutes(client):
         #print(tuples)
         tupletsArray.append( Tuples(i['time'], i['s_ip']) )
     os.system("killall influxd >/dev/null 2>&1 &")
+
+    graphana = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 8094
+    
+    IPS = "graph,pkts=%d  %d"
+    timestamp = int(datetime.datetime.now().timestamp() * 1000000000) #nanoseconds since 1st Jan 1970
+    msg = IPS % (graphana, timestamp)
+    self.logger.info(msg)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
     return tupletsArray
 			
 		
