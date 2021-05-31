@@ -105,7 +105,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         datapath.send_msg(mod)
 
     def adding_influx(self, pkt):
-    
+        print("Si tingués la màgia d'un mac...\n"*10)
         ips4 = pkt.get_protocols(ipv4.ipv4)
         if len(ips4) > 0:
             #self.logger.info(ips4)

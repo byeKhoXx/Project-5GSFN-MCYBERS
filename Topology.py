@@ -101,7 +101,7 @@ class MyTopo(Topo):
         
         # *** DNS configuration *** NOT WORKING AUTOMATICALLY
         # - Start DNS
-        dynDNS.cmd("cd dns && ruby dns.rb &")
+        #dynDNS.cmd("cd dns && ruby dns.rb &")
         
         # - Change default DNS
         r1.cmd('echo "nameserver 10.0.3.2" >> /etc/resolv.conf')

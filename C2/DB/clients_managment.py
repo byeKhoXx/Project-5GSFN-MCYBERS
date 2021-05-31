@@ -86,14 +86,14 @@ def get_last_two_minutes(client):
     clientInflux = InfluxDBClient(host='localhost', port=8086)
     clientInflux.switch_database('Project')
     ip = " '"+client.ip+"' "
-    last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"s_ip\" =  "+ip+"")
+    last2 = clientInflux.query("SELECT * FROM ips WHERE time > now() - 2m AND \"d_ip\" =  "+ip+"")
     tupletsArray = []
     for i in last2.get_points(measurement='ips'):
         #print(tuples)
         tupletsArray.append( Tuples(i['time'], i['s_ip']) )
     os.system("killall influxd >/dev/null 2>&1 &")
 
-    graphana = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
+    """graphana = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     UDP_IP = "127.0.0.1"
     UDP_PORT = 8094
     
@@ -102,7 +102,7 @@ def get_last_two_minutes(client):
     msg = IPS % (graphana, timestamp)
     self.logger.info(msg)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
+    sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))"""
     return tupletsArray
 			
 		
@@ -114,7 +114,7 @@ def get_number_15_minutes(client):
     clientInflux = InfluxDBClient(host='localhost', port=8086)
     clientInflux.switch_database('Project')
     ip = " '"+client.ip+"' "
-    last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
+    last15 = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"d_ip\" = "+ip+"")
     count = -1
     for j in last15.get_points(measurement='ips'):
         #print(j['count_s_ip'])
