@@ -161,7 +161,7 @@ class SimpleSwitchSnort(app_manager.RyuApp):
         # install a flow to avoid packet_in next time
         """if out_port != ofproto.OFPP_FLOOD:
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
-            self.add_flow(datapath, 1, match, actions)"""
+            self.add_flow(datapath, 1, match, actions)
 
         data = None
         if msg.buffer_id == ofproto.OFP_NO_BUFFER:
@@ -169,6 +169,6 @@ class SimpleSwitchSnort(app_manager.RyuApp):
 
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=in_port, actions=actions, data=data)
-        datapath.send_msg(out)
+        datapath.send_msg(out)"""
 
 
