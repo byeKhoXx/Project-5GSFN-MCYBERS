@@ -12,7 +12,7 @@ import requests
 # Client's data
 DYNDNS_Name = 'acme' # Name from client in DynDNS
 DYNDNS_Pass = 'acme' # Pass from client in DynDNS
-DynDNS_IP = '10.0.3.2:8000' # IP from the DynDNS
+DynDNS_IP = '192.168.1.3:8000' # IP from the DynDNS
 SwitchID = '0000000000000002' # Switch ID of the customer
 client = "10.0.2.2"
 REVERSE_Proxy_IP = "10.0.3.2"
@@ -80,10 +80,14 @@ def endDDoS():
     global DDoSactive
     global client
     # Change DynDNS record
-    if DDoSactive == True:
+    if DDoSactive:
         DDoSactive = False
         r = requests.get('http://'+ DynDNS_IP + '/?myip='+ client, auth=(DYNDNS_Name, DYNDNS_Pass))
         print(r)
+        with open("to_run.sh", "w") as fp:
+            fp.write("sudo ./init_fw.sh")
+            fp.close()
+        
 
 # Every 10min we check if DoS is active
 def checkDoS():
@@ -113,6 +117,7 @@ def dos_attack_handler(key):
     #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
     #print(r)
     if not DoSactive:
+    	
         with open("to_run.sh", "w") as fp:
         	fp.write("curl -X POST -d "+ '\'{"nw_src": "' + key+ '", "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
         	fp.close()
@@ -129,16 +134,18 @@ def ddos_attack_handler():
     global REVERSE_Proxy_IP
     global SwitchID
     # DDoS protection active
-    DDoSactive = True
-    # Change DynDNS record
-    r = requests.get('http://'+ DynDNS_IP + '/?myip='+REVERSE_Proxy_IP, auth=(DYNDNS_Name, DYNDNS_Pass))
-    print(r)
-    # Firewall block trafic
-    #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
-    #print(r)
-    with open("to_run.sh", "w") as fp:
-    	fp.write("curl -X POST -d "+ '\'{"nw_src": ' + key +', "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
-    	fp.close()
+    if not DDoSactive:
+        print("taking measures")
+        DDoSactive = True
+        # Change DynDNS record
+        r = requests.get('http://'+ DynDNS_IP + '/?myip='+REVERSE_Proxy_IP, auth=(DYNDNS_Name, DYNDNS_Pass))
+        print(r)
+        # Firewall block trafic
+        #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
+        #print(r)
+        with open("to_run.sh", "w") as fp:
+            fp.write("curl -X DELETE -d "+ '\'{"rule_id": "all"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
+            fp.close()
 
 # DoS detection
 def DoS():
@@ -187,23 +194,25 @@ def DoS():
 
 # DDoS detection
 def DDoS():
+    global DDoSactive
     print("Checking for DDoS")
     # Calculate the time slot
     # Get the last 15 min traffic
     _, packets, _ = get_data()
     # Get the mean
     _, _, mean10 = get_data()   
-    if packets > mean10 * 2:
+    #if packets > mean10 * 2:
+    if True:
         # DDoS attack
         print("NEW ATTACK: DDoS")
-        ddos_attack_handler("")
+        ddos_attack_handler()
 
 
 def scheduler():  # Scheduler for tasks every X minutes
     schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
-    schedule.every(5).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
+    schedule.every(2).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
     schedule.every(2).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
-    schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
+    schedule.every().minute.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()
 

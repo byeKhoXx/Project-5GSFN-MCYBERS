@@ -1,0 +1,1 @@
+curl -X DELETE -d '{"rule_id": "all"}' http://localhost:8080/firewall/rules/0000000000000002

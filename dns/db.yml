@@ -1,8 +1,8 @@
 ---
-SERIAL: 2015110234
+SERIAL: 2015110237
 acme:
   pass: acme
-  A: 10.0.2.2
+  A: 10.0.3.2
 dns:
   pass: dns
   A: 10.0.3.2
