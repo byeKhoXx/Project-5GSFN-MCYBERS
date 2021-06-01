@@ -201,8 +201,8 @@ def DDoS():
     _, packets, _ = get_data()
     # Get the mean
     _, _, mean10 = get_data()   
-    #if packets > mean10 * 2:
-    if True:
+    if packets > mean10 * 2:
+    #if True:
         # DDoS attack
         print("NEW ATTACK: DDoS")
         ddos_attack_handler()
@@ -210,9 +210,9 @@ def DDoS():
 
 def scheduler():  # Scheduler for tasks every X minutes
     schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
-    schedule.every(2).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
+    schedule.every(10).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
     schedule.every(2).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
-    schedule.every().minute.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
+    schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()
 
