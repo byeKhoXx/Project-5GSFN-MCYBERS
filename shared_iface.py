@@ -20,6 +20,7 @@ sniffobj = Sniff("s2-script", filters="dst 10.0.2.2 and dst port 80", count=-1, 
 for plen, t, buf in sniffobj.capture():
     line = binascii.hexlify(buf)
     ip = ".".join([str(int(i, 16)) for i in [line[i:i+2] for i in range(0, len(line), 2)][26:30]])
+    print(ip)
     insert_packet(ip)
 
 

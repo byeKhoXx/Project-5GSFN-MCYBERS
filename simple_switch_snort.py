@@ -154,9 +154,8 @@ class SimpleSwitchSnort(app_manager.RyuApp):
             out_port = self.mac_to_port[dpid][dst]
         else:
             out_port = ofproto.OFPP_FLOOD
-
-        actions = [parser.OFPActionOutput(out_port),
-                   parser.OFPActionOutput(self.snort_port)]
+        #parser.OFPActionOutput(out_port),
+        actions = [parser.OFPActionOutput(self.snort_port)]
 
         # install a flow to avoid packet_in next time
         if out_port != ofproto.OFPP_FLOOD:

@@ -93,8 +93,13 @@ def checkDoS():
     if DoSactive == True:
         DoSactive = False
         # Delete rules
-        r = requests.delete('http://localhost:8080/firewall/rules/' + SwitchID, data={'rule_id': 'all'})
-        print(r)
+        #r = requests.delete('http://localhost:8080/firewall/rules/' + SwitchID, data={'rule_id': 'all'})
+        #print(r)
+        print("ATTACK MITIGATED")
+        with open("to_run.sh", "w") as fp:
+            fp.write("curl -X POST -d "+ '\'{"rule_id": "all"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID + "\n")
+            fp.write("sudo ./init_fw.sh")
+            fp.close()
         
 
 def dos_attack_handler(key):
@@ -105,8 +110,13 @@ def dos_attack_handler(key):
     # DoS protection active
     DoSactive = True
     # Add rule to block the IP
-    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
-    print(r)
+    #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
+    #print(r)
+    with open("to_run.sh", "w") as fp:
+    	fp.write("curl -X POST -d "+ '\'{"nw_src": "' + key+ '", "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
+    	fp.close()
+ 
+
 
 
 def ddos_attack_handler():
@@ -123,9 +133,11 @@ def ddos_attack_handler():
     r = requests.get('http://'+ DynDNS_IP + '/?myip='+REVERSE_Proxy_IP, auth=(DYNDNS_Name, DYNDNS_Pass))
     print(r)
     # Firewall block trafic
-    r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
-    print(r)
-
+    #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'actions': 'DENY', 'priority': '2'})
+    #print(r)
+    with open("to_run.sh", "w") as fp:
+    	fp.write("curl -X POST -d "+ '\'{"nw_src": ' + key +', "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
+    	fp.close()
 
 # DoS detection
 def DoS():
@@ -189,7 +201,7 @@ def DDoS():
 def scheduler():  # Scheduler for tasks every X minutes
     schedule.every().minute.do(DoS)  # Executing "Dos()" every minute
     schedule.every(5).minutes.do(endDDoS)  # Executing "endDDoS()" every 5 minute
-    schedule.every(10).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
+    schedule.every(2).minutes.do(checkDoS)  # Executing "checkDoS()" every 10 minute
     schedule.every(15).minutes.do(DDoS)  # Executing "DDoS()" eevry 15 minutes
     while 1:
         schedule.run_pending()

@@ -81,8 +81,6 @@ def get_last_two_minutes(client):
     """ Return tupple of packets last two minutes 
          With packets like [timestamp, src_ip]
          return = [[timestamp1, src_ip1], [timestamp2, src_ip2] ... [timestampX, src_ipX] """
-    os.system("influxd >/dev/null 2>&1 &") 
-    sleep(1)
     clientInflux = InfluxDBClient(host='localhost', port=8086)
     clientInflux.switch_database('Project')
     ip = " '"+client.ip+"' "
@@ -91,7 +89,6 @@ def get_last_two_minutes(client):
     for i in last2.get_points(measurement='ips'):
         #print(tuples)
         tupletsArray.append( Tuples(i['time'], i['s_ip']) )
-    os.system("killall influxd >/dev/null 2>&1 &")
 
     """graphana = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 15m AND \"s_ip\" = "+ip+"")
     UDP_IP = "127.0.0.1"
@@ -119,7 +116,6 @@ def get_number_15_minutes(client):
     for j in last15.get_points(measurement='ips'):
         #print(j['count_s_ip'])
         count = j['count_s_ip']
-    os.system("killall influxd >/dev/null 2>&1 &")
     return count
 	
 
