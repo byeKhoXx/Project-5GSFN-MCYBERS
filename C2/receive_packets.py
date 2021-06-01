@@ -97,7 +97,7 @@ def checkDoS():
         #print(r)
         print("ATTACK MITIGATED")
         with open("to_run.sh", "w") as fp:
-            fp.write("curl -X POST -d "+ '\'{"rule_id": "all"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID + "\n")
+            fp.write("curl -X DELETE -d "+ '\'{"rule_id": "all"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID + "\n")
             fp.write("sudo ./init_fw.sh")
             fp.close()
         
@@ -108,14 +108,15 @@ def dos_attack_handler(key):
     global DoSactive
     global SwitchID
     # DoS protection active
-    DoSactive = True
+   
     # Add rule to block the IP
     #r = requests.post('http://localhost:8080/firewall/rules/' + SwitchID, data={'nw_src':key, 'actions': 'DENY', 'priority': '2'})
     #print(r)
-    with open("to_run.sh", "w") as fp:
-    	fp.write("curl -X POST -d "+ '\'{"nw_src": "' + key+ '", "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
-    	fp.close()
- 
+    if not DoSactive:
+        with open("to_run.sh", "w") as fp:
+        	fp.write("curl -X POST -d "+ '\'{"nw_src": "' + key+ '", "nw_dst": "10.0.2.2", "actions": "DENY", "priority": "2"}\'' + " http://localhost:8080/firewall/rules/" + SwitchID)
+        	fp.close()
+        DoSactive = True
 
 
 

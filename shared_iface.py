@@ -14,8 +14,8 @@ def insert_packet(src):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
 
-
-sniffobj = Sniff("s2-script", filters="dst 10.0.2.2 and dst port 80", count=-1, promisc=1, out_file="pcap.pcap")
+print("Started the shared iface")
+sniffobj = Sniff("s2-eth1", filters="dst 10.0.2.2 and dst port 80", count=-1, promisc=1, out_file="pcap.pcap")
 
 for plen, t, buf in sniffobj.capture():
     line = binascii.hexlify(buf)
