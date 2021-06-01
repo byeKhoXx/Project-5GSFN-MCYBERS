@@ -1,7 +1,7 @@
 from influxdb import InfluxDBClient
 import datetime
 from datetime import timedelta
-
+import socket
 
 def get_mean_for_last(client,time_slot = 75,num_of_days = 5 ):
     """
@@ -74,8 +74,68 @@ def get_mean_for_last(client,time_slot = 75,num_of_days = 5 ):
     print(counter / num_of_days)
     return counter / num_of_days
 	
-get_mean_for_last("A")
+#get_mean_for_last("A")
 
-           #date_to_check_down = datetime.time(int(str(tt)[0:2]),45) + timedelta(minutes = 15)
+
+def get_post():
+
+	clientInflux = InfluxDBClient(host='localhost', port=8086)
+	clientInflux.switch_database('RYU')
+	ip = " '10.0.1.3' "
+	grafana = clientInflux.query("SELECT COUNT(*) FROM ips WHERE time > now() - 2m")
+	
+	print(grafana)
+	count = -1
+	for j in grafana.get_points(measurement='ips'):
+		#print(j['count_s_ip'])
+		count = j['count_s_ip']
+	print(count)
+	
+	UDP_IP = "127.0.0.1"
+	UDP_PORT = 8094
+	IPS = "graph,pkts=%d s_ip=\"%s\",d_ip=\"%s\" %d"
+	timestamp = int(datetime.datetime.now().timestamp() * 1000000000) #nanoseconds since 1st Jan 1970
+	msg = IPS % (count,"asdf","asdf", timestamp)
+	#self.logger.info(msg)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
+		                
+get_post()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
