@@ -45,11 +45,10 @@ First of all you'll need python http server.
 $ pip3 install socketserver
 ```
 
-*** IF NOT WORKING AUTOMATICALLY ***
-If the webserver does not work automatically, run in the `cust` terminal teh following command:
+To execute it, run:
 
 ```sh
-$ python -m http.server --directory customer_webserver/ 80
+$ cd customer-webserver && ./start
 ```
 
 ### DynDNS
@@ -58,11 +57,23 @@ First of all you'll need ruby.
 $ sudo apt install ruby
 ```
 
-*** IF NOT WORKING AUTOMATICALLY ***
-If the dns does not work automatically, run in the `dynDNS` terminal teh following command:
+To execute it, run:
 
 ```sh
 $ cd dns && ruby dns.rb
+```
+
+### Proxy
+First of all you'll need to create a virtual enviroment and name it proxy-env for it and install porxy.py 
+```sh
+$ pip install porxy.py
+```
+then copy the web_server_route.py file form the configs folder to the plugins folder os proxy py located in the libs folder of the virtual eviroment.
+
+To execute it, run:
+
+```sh
+$ ./start
 ```
 
 
