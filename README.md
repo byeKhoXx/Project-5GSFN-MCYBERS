@@ -122,20 +122,17 @@ Setting up Datasource in Grafana:
 > Add Datasource
 > Select InfluxDB
 > set the URL of the local influx running (http://localhost:8086)
-> set the name of the DB (eg. RYU)
+> set the name of the DB (eg. Project)
 > ***we can set multiple datasource and set only one as Default
 ```
 
 Setting up Dashboard in Grafana:
 
 > Click on the + and add a new panel
-> To make our lives easier - look at the picture below to visualize simple flows
+> To visualize the periodic traffic one must execute the following query in Grafana:
+>
+>  `` select * from graph ``
 
-
-![Capture](https://user-images.githubusercontent.com/24268426/117440602-8df90700-af34-11eb-88c1-d64ade629b74.PNG)
-
-
-> by clicking on Query Inspector on the right we can see the raw request - in case we need to use the same command for CC
-> ![image](https://user-images.githubusercontent.com/24268426/117441398-96057680-af35-11eb-9e13-b8fd94198aeb.png)
+![Capture](https://user-images.githubusercontent.com/24268426/120670144-6ee88900-c490-11eb-9f35-126891389266.PNG)
 
 
