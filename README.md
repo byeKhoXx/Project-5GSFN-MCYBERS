@@ -83,7 +83,9 @@ $ ./start
 ```sh
 $ sudo mn --custom Topology.py --topo mytopo --switch ovsk --controller remote #Creates the network
 $ sudo ryu-manager simple_switch_snort.py ../ryu/ryu/app/rest_firewall.py # Sets up the controller with telegraf and the Firewall
-$ ./init_fw.sh #Initialize the Firewall to let the traffic go through the switches. Add execution permission to the script if it is necessary.
+$ sudo ./init_fw.sh #Initialize the Firewall to let the traffic go through the switches. Add execution permission to the script if it is necessary.
+$ sudo python3 shared-iface.py # To populate the influxDB
+$ sudo python3 exporter.py
 ```
 
 ## Using Influx - Telegraf - Grafana
